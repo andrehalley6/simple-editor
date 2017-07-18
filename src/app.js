@@ -3,81 +3,13 @@
 var jQuery = require('jquery');
 var $ = jQuery;
 
-// function to upload an image
-var submit = document.getElementById("submit");
-
-submit.addEventListener("click", function(e){
-    // get input value
-    var formData = new FormData();
-    var file = document.getElementById("upload").files[0];
-    formData.append("upload", file);
-
-    // create new XMLHttpRequest object for AJAX
-    var xhr = new XMLHttpRequest();
-
-    // set AJAX method & URL
-    xhr.open("post", "/uploads", true);
-
-    xhr.onreadystatechange = function() {
-        if(xhr.readyState == 4 && xhr.status == 200) {
-            console.log(xhr.responseText);
-            var response = JSON.parse(xhr.responseText);
-			
-			// append new uploaded image into listImages
-			var ul = document.getElementById("listImages");
-			var li = document.createElement("li");
-			li.innerHTML = "<img src=\"" + response.file + "\" class=\"img-rounded block-add draggable\" draggable=\"true\" />";
-			ul.appendChild(li);
-            // return true;
-        }
-        else {
-        	console.log(xhr.responseText);
-        	// return false;
-        }
-    }
-    
-	xhr.send(formData);
-}, false);
-
-// function to show images
-function loadImages() {
-	// create new XMLHttpRequest object for AJAX
-	var xhr = new XMLHttpRequest();
-
-	// set AJAX method & URL
-	xhr.open('get', '/images', true);
-
-	xhr.onreadystatechange = function() {
-		if(xhr.readyState == 4 && xhr.status == 200) {
-			// get AJAX json response text and parse into array
-            var obj = JSON.parse(xhr.responseText);
-
-            // get ul element with id listImages
-            var ul = document.getElementById('listImages');
-            for(var i = 0; i < obj.length; i++) {
-            	// create new li
-            	var li = document.createElement('li');
-
-            	// insert img with src and class
-            	li.innerHTML = "<img src=\"" + obj[i] + "\" class=\"img-rounded block-add draggable\" draggable=\"true\" />";
-
-            	// append as ul children
-            	ul.appendChild(li);
-            }
-        }
-        else {
-        }
-	}
-	xhr.send(null);
-	return false;
-}
-
 $(document).ready(function(e) {
 	var selected = null, // Object of the element to be moved
 	    x_pos = 0, y_pos = 0, // Stores x & y coordinates of the mouse pointer
 	    x_elem = 0, y_elem = 0; // Stores top, left values (edge) of the element
 	var canvas_width = $(".block").width(), 
 		canvas_height = $(".block").height();
+	var object_size = 0.25; // Default size is 25% from canvas size
 
 	// Get all images in folder
 	$.get('/images', function(data) {
@@ -102,7 +34,8 @@ $(document).ready(function(e) {
 	    x_elem = x_pos - selected.offsetLeft;
 	    y_elem = y_pos - selected.offsetTop;
 
-	    $(elem).addClass('item selected');
+	    $(".item").removeClass("selected");
+	    $(elem).addClass('selected');
 	}
 
 	// Will be called when user dragging an element
@@ -131,47 +64,29 @@ $(document).ready(function(e) {
 			if(selected.offsetTop + selected.offsetHeight - space_y > canvas_height) {
 				selected.style.top = (canvas_height - selected.offsetHeight + space_y) + 'px';
 			}
+
+			// if(selected.offsetLeft < 0) {
+			// 	selected.style.left = '0px';
+			// }
+
+			// if(selected.offsetTop < 0) {
+			// 	selected.style.top = '0px';
+			// }
+
+			// if(selected.offsetLeft + selected.offsetWidth > canvas_width) {
+			// 	selected.style.left = (canvas_width - selected.offsetWidth) + 'px';
+			// }
+
+			// if(selected.offsetTop + selected.offsetHeight > canvas_height) {
+			// 	selected.style.top = (canvas_height - selected.offsetHeight) + 'px';
+			// }
 		}
 	}
 
 	// Destroy the object when we are done
 	function _destroy() {
-		$(selected).removeClass('item selected');
 		selected = null;
 	}
-
-	// Bind the functions...
-	// document.getElementById('draggable-element').onmousedown = function () {
-	// document.getElementsByClassName('draggable-element').onmousedown = function () {
-	// 	console.log(this);
-	// 	_drag_init(this);
-	// 	return false;
-	// };
-
-	$(document).on('click', '.img-rounded', function(e) {
-		var src = $(this).attr('src');
-		var img = $("<div><img src=\"" + src + "\" class=\"item draggable-element inserted-element\" /></div>");
-		$(".block").append(img);
-	});
-
-	$("#addText").on('click', function(e) {
-		var text = $("<div><p class=\"item text-element draggable-element inserted-element\">Add your text!</p></div>");
-		$(".block").append(text);
-	});
-
-	$(document).on('dblclick', 'p.text-element', function(e) {
-		$(this).css('position', 'absolute').attr('contenteditable', true).removeClass('draggable-element').focus();
-		setTimeout(function() {
-			if(document.activeElement !== $(this)) {
-				$(this).attr('contenteditable', false);
-			}
-		}, 300);
-	});
-
-	$(document).on('blur', 'p.text-element', function(e) {
-		$(this).attr('contenteditable', false);
-		$(this).addClass('draggable-element').css('position', '');
-	});
 
 	$(document).on('mousedown', '.draggable-element', function(e) {
 		_drag_init(this);
@@ -224,8 +139,27 @@ $(document).ready(function(e) {
 		// add images here
 		var x = Math.floor(e.pageX - $(".block").offset().left);
 		var y = Math.floor(e.pageY - $(".block").offset().top);
+		console.log(x, y);
+		// canvas width, height = 600px
+		var object_width = (object_size * canvas_width) / 2;
+		var object_height = (object_size * canvas_height) / 2;
+		if(x < object_width) {
+			x = object_width;
+		}
+
+		if(y < object_height) {
+			y = object_height;
+		}
+
+		if(x + object_width > canvas_width) {
+			x = canvas_width - object_width;
+		}
+
+		if(y + object_height > canvas_height) {
+			y = canvas_height - object_height;
+		}
 		var elem = $("img.active");
-		var added_element = $("<div><img src=\"" + elem.attr('src') + "\" class=\"draggable-element inserted-element\" style=\"left: " + x + "; top: " + y + ";\" /></div>")
+		var added_element = $("<div><img src=\"" + elem.attr('src') + "\" class=\"item draggable-element inserted-element\" style=\"left: " + x + "px; top: " + y + "px;\" /></div>");
 		$(".block").append(added_element);
 	}
 
@@ -237,4 +171,79 @@ $(document).ready(function(e) {
 
 	document.onmousemove = _move_elem;
 	document.onmouseup = _destroy;
+
+	// Bind the functions...
+	// document.getElementById('draggable-element').onmousedown = function () {
+	// document.getElementsByClassName('draggable-element').onmousedown = function () {
+	// 	console.log(this);
+	// 	_drag_init(this);
+	// 	return false;
+	// };
+
+	$(window).on('click', function(e) {
+		$(".item").removeClass("selected");
+	});
+
+	$(document).on('click', '.item', function(e) {
+		e.stopPropagation();
+	});
+
+	// key event (move left, right, up, down, delete)
+	$(document).on('keyup', function(e) {
+		var key = e.which;
+		var element = $(".item.selected");
+		var position = element.offset();
+		console.log(position);
+		switch(key) {
+			case 37:
+				// left
+				// var left = Math.floor(position.left-1);
+				// element.css('left', left);
+				var left = Math.floor(position.left-=1);
+				console.log(left);
+				break;
+			case 38:
+				// up
+				break;
+			case 39:
+				// right
+				break;
+			case 40:
+				// down
+				break;
+			case 46:
+				// delete
+				element.remove();
+				break;
+		}
+	});
+
+	// add image into canvas by clicking on image
+	$(document).on('click', '.img-rounded', function(e) {
+		var src = $(this).attr('src');
+		var img = $("<div><img src=\"" + src + "\" class=\"item draggable-element inserted-element\" /></div>");
+		$(".block").append(img);
+	});
+
+	// add text into canvas
+	$("#addText").on('click', function(e) {
+		var text = $("<div><p class=\"item text-element draggable-element inserted-element\">Add your text!</p></div>");
+		$(".block").append(text);
+	});
+
+	// canvas text change by double click
+	$(document).on('dblclick', 'p.text-element', function(e) {
+		$(this).attr('contenteditable', true).removeClass('draggable-element').focus();
+		setTimeout(function() {
+			if(document.activeElement !== $(this)) {
+				$(this).attr('contenteditable', false);
+			}
+		}, 300);
+	});
+
+	// set back text after finish editing
+	$(document).on('blur', 'p.text-element', function(e) {
+		$(this).attr('contenteditable', false);
+		$(this).addClass('draggable-element');
+	});
 });
