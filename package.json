@@ -1,19 +1,20 @@
 {
-  "name": "create-editor",
-  "version": "0.0.1",
-  "description": "package for js candidate test",
-  "main": "index.js",
+  "name": "simple-editor",
+  "version": "1.0.0",
+  "description": "simple HTML5 editor",
+  "main": "server.js",
   "scripts": {
     "start": "nodemon server.js"
   },
-  "author": "jun",
+  "author": "andrehalley6",
   "license": "ISC",
   "dependencies": {
     "express": "^4.13.4",
-    "jquery": "^2.2.3",
+    "jquery": "^2.2.4",
     "junk": "^1.0.2",
     "multer": "^1.1.0",
-    "nodemon": "^1.9.1"
+    "nodemon": "^1.9.1",
+    "webpack": "^3.3.0"
   },
   "devDependencies": {}
 }

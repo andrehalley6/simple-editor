@@ -10,7 +10,7 @@
 <div class="sidepane col-sm-2 col-md-2 col-lg-2">
   <div class="form">
     <h3>Form</h3>
-      <input type="file" class="form-control" placeholder="Upload Your Images" name="upload">
+      <input type="file" class="form-control" placeholder="Upload Your Images" name="upload" id="upload">
       <button id="submit" class="btn btn-default">upload</button>
     <!-- Upload Form here -->
   </div>
@@ -23,9 +23,9 @@
     </div>
     <div class="image">
         <h4>Images</h4>
-        <ul class="list-unstyled">
+        <ul class="list-unstyled" id="listImages">
             <!-- List of images here -->
-            <!-- <li><img src="images/sample.jpeg" class="img-rounded" /></li> -->
+            <li><img src="images/sample.jpg" class="img-rounded draggable" /></li>
         </ul>
     </div>
   </div>
@@ -34,8 +34,9 @@
 <div class="canvas col-sm-8 col-md-8 col-lg-8">
     <div class="block">
         <!-- Add images and texts to here -->
+        <div><img src="images/uploads-1462948453043.png" class="item draggable-element inserted-element" /></div>
     </div>
 </div>
-
+<script type="text/javascript" src="bundle.js"></script>
 </body>
 </html>

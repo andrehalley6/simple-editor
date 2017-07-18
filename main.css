@@ -56,4 +56,21 @@ html, body {
 
 .item.selected {
   border-color: blue;
+  z-index: 10000;
+}
+
+.list-unstyled {
+  cursor: pointer;
+}
+
+.draggable-element {
+  position: absolute;
+  cursor: move;
+}
+
+.inserted-element {
+  width: 25%;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
 }
