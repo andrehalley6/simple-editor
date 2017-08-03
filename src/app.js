@@ -210,7 +210,7 @@ $(document).ready(function(e) {
 				// left
 				left--;
 				// if already leftmost, stop move
-				if(left >= object_width) {
+				if(Math.ceil(left) >= object_width) {
 					element.css('left', left + 'px');
 				}
 				break;
@@ -218,7 +218,7 @@ $(document).ready(function(e) {
 				// up
 				top--;
 				// if already topmost, stop move
-				if(top >= object_height) {
+				if(Math.ceil(top) >= object_height) {
 					element.css('top', top + 'px');
 				}
 				break;
@@ -226,7 +226,7 @@ $(document).ready(function(e) {
 				// right
 				left++;
 				// if already rightmost, stop move
-				if(left + object_width <= canvas_width) {
+				if(Math.ceil(left) + object_width <= canvas_width) {
 					element.css('left', left + 'px');
 				}
 				break;
@@ -234,7 +234,7 @@ $(document).ready(function(e) {
 				// down
 				top++;
 				// if already bottommost, stop move
-				if(top + object_height <= canvas_height) {
+				if(Math.ceil(top) + object_height <= canvas_height) {
 					element.css('top', top + 'px');
 				}
 				break;
