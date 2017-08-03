@@ -10,6 +10,8 @@ $(document).ready(function(e) {
 	var canvas_width = $(".block").width(), 
 		canvas_height = $(".block").height();
 	var object_size = 0.25; // Default size is 25% from canvas size
+	var object_width = (object_size * canvas_width) / 2;
+	var object_height = (object_size * canvas_height) / 2;
 
 	// Get all images in folder
 	$.get('/images', function(data) {
@@ -139,10 +141,9 @@ $(document).ready(function(e) {
 		// add images here
 		var x = Math.floor(e.pageX - $(".block").offset().left);
 		var y = Math.floor(e.pageY - $(".block").offset().top);
-		console.log(x, y);
 		// canvas width, height = 600px
-		var object_width = (object_size * canvas_width) / 2;
-		var object_height = (object_size * canvas_height) / 2;
+		// var object_width = (object_size * canvas_width) / 2;
+		// var object_height = (object_size * canvas_height) / 2;
 		if(x < object_width) {
 			x = object_width;
 		}
@@ -189,27 +190,53 @@ $(document).ready(function(e) {
 	});
 
 	// key event (move left, right, up, down, delete)
-	$(document).on('keyup', function(e) {
+	$(document).on('keydown', function(e) {
 		var key = e.which;
 		var element = $(".item.selected");
-		var position = element.offset();
-		console.log(position);
+		// var position = element.offset();
+		// var position = element.position();
+		// var x = Math.floor(e.pageX - $(".block").offset().left);
+		// var y = Math.floor(e.pageY - $(".block").offset().top);
+		// console.log(element.offset().left, element.offset().top, $(".block").offset().left, $(".block").offset().top, position, x, y);
+		
+		var left = parseInt(element.css('left'));
+		var top = parseInt(element.css('top'));
+		
+		// canvas width, height = 600px
+		// var object_width = Math.ceil((object_size * canvas_width) / 2);
+		// var object_height = Math.ceil((object_size * canvas_height) / 2);
 		switch(key) {
 			case 37:
 				// left
-				// var left = Math.floor(position.left-1);
-				// element.css('left', left);
-				var left = Math.floor(position.left-=1);
-				console.log(left);
+				left--;
+				// if already leftmost, stop move
+				if(left >= object_width) {
+					element.css('left', left + 'px');
+				}
 				break;
 			case 38:
 				// up
+				top--;
+				// if already topmost, stop move
+				if(top >= object_height) {
+					element.css('top', top + 'px');
+				}
 				break;
 			case 39:
 				// right
+				left++;
+				// if already rightmost, stop move
+				if(left + object_width <= canvas_width) {
+					element.css('left', left + 'px');
+				}
 				break;
 			case 40:
 				// down
+				top++;
+				// if already bottommost, stop move
+				if(top + object_height <= canvas_height) {
+					element.css('top', top + 'px');
+				}
 				break;
 			case 46:
 				// delete
